@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Article - AI Article Generator{% endblock %}
+
+{% block content %}
+{% if config_errors %}
+<div class="alert alert-error">
+    <strong>Configuration Required:</strong>
+    <ul>
+        {% for error in config_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+    <p style="margin-top: 10px;">Please check your environment variables or .env file.</p>
+</div>
+{% endif %}
+
+{% if not google_authenticated %}
+<div class="alert alert-warning">
+    <strong>Google Authentication Needed:</strong>
+    You need to authenticate with Google before generating articles.
+    Run <code>article-gen auth</code> on the server to complete authentication.
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>Generate Education Article</h2>
+    <form action="/generate" method="POST">
+        <div class="form-group">
+            <label for="topic">Article Topic *</label>
+            <input type="text" id="topic" name="topic" required
+                   placeholder="e.g., Benefits of Project-Based Learning">
+            <p class="help-text">Enter the main topic for your education article</p>
+        </div>
+
+        <div class="form-group">
+            <label for="audience">Target Audience</label>
+            <select id="audience" name="audience">
+                <option value="educators and teachers">Educators and Teachers</option>
+                <option value="school administrators">School Administrators</option>
+                <option value="parents">Parents</option>
+                <option value="higher education faculty">Higher Education Faculty</option>
+                <option value="curriculum developers">Curriculum Developers</option>
+                <option value="education technology specialists">EdTech Specialists</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="article_type">Article Type</label>
+            <select id="article_type" name="article_type">
+                <option value="informative">Informative</option>
+                <option value="how-to">How-To Guide</option>
+                <option value="analysis">Analysis / Deep Dive</option>
+                <option value="opinion">Opinion / Perspective</option>
+                <option value="research summary">Research Summary</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="max_sources">Research Sources (max)</label>
+            <input type="number" id="max_sources" name="max_sources" value="5" min="1" max="10">
+            <p class="help-text">Number of web sources to research (1-10)</p>
+        </div>
+
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="skip_research" name="skip_research" value="true">
+                <label for="skip_research" style="margin-bottom: 0;">Skip web research</label>
+            </div>
+            <p class="help-text">Generate article using AI knowledge only (faster but less current)</p>
+        </div>
+
+        <button type="submit" {% if config_errors %}disabled{% endif %}>
+            Generate Article
+        </button>
+    </form>
+</div>
+
+{% if recent_jobs %}
+<div class="card">
+    <h2>Recent Jobs</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Topic</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in recent_jobs %}
+            <tr>
+                <td>{{ job.topic[:40] }}{% if job.topic|length > 40 %}...{% endif %}</td>
+                <td><span class="status-badge status-{{ job.status }}">{{ job.status }}</span></td>
+                <td>{{ job.created_at[:16] }}</td>
+                <td><a href="/job/{{ job.id }}">View</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

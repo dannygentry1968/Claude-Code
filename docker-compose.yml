@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  article-generator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-article-generator
+    ports:
+      - "8000:8000"
+    environment:
+      # Anthropic API Key (required)
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
+      # Model selection (optional)
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-claude-sonnet-4-20250514}
+
+      # Article settings (optional)
+      - ARTICLE_MIN_WORDS=${ARTICLE_MIN_WORDS:-800}
+      - ARTICLE_MAX_WORDS=${ARTICLE_MAX_WORDS:-2000}
+      - MAX_RESEARCH_SOURCES=${MAX_RESEARCH_SOURCES:-5}
+
+      # Google Drive folder (optional)
+      - GOOGLE_DRIVE_FOLDER_ID=${GOOGLE_DRIVE_FOLDER_ID:-}
+
+      # Credential paths inside container
+      - GOOGLE_CREDENTIALS_FILE=/app/credentials/credentials.json
+      - GOOGLE_TOKEN_FILE=/app/credentials/token.json
+    volumes:
+      # Mount credentials directory
+      - ./credentials:/app/credentials:rw
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# Optional: Add reverse proxy with HTTPS
+#  nginx:
+#    image: nginx:alpine
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+#      - ./ssl:/etc/nginx/ssl:ro
+#    depends_on:
+#      - article-generator
+#    restart: unless-stopped
