@@ -15,8 +15,8 @@ class Config:
     anthropic_api_key: str = ""
 
     # Google Drive settings
-    google_credentials_file: Path = Path("credentials.json")
-    google_token_file: Path = Path("token.json")
+    google_credentials_file: Path = Path("credentials/credentials.json")
+    google_token_file: Path = Path("credentials/token.json")
     google_drive_folder_id: str = ""  # Optional: specific folder to save articles
 
     # Article generation settings
@@ -42,8 +42,8 @@ class Config:
 
         return cls(
             anthropic_api_key=os.getenv("ANTHROPIC_API_KEY", ""),
-            google_credentials_file=Path(os.getenv("GOOGLE_CREDENTIALS_FILE", "credentials.json")),
-            google_token_file=Path(os.getenv("GOOGLE_TOKEN_FILE", "token.json")),
+            google_credentials_file=Path(os.getenv("GOOGLE_CREDENTIALS_FILE", "credentials/credentials.json")),
+            google_token_file=Path(os.getenv("GOOGLE_TOKEN_FILE", "credentials/token.json")),
             google_drive_folder_id=os.getenv("GOOGLE_DRIVE_FOLDER_ID", ""),
             default_model=os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
             max_research_sources=int(os.getenv("MAX_RESEARCH_SOURCES", "5")),
